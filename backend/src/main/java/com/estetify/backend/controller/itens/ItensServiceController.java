@@ -2,8 +2,10 @@ package com.estetify.backend.controller.itens;
 
 import com.estetify.backend.models.itens.ItensProduct;
 import com.estetify.backend.models.itens.ItensService;
+import com.estetify.backend.repository.ItensProductRepository;
 import com.estetify.backend.repository.ItensServiceRepository;
 import com.estetify.backend.utils.ItensType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,11 @@ import java.util.List;
 @RequestMapping("/api/service")
 public class ItensServiceController  {
 
+    @Autowired
+    private ItensProductRepository productRepository;
+
     private final ItensServiceRepository repository;
+
     public ItensServiceController(ItensServiceRepository repository) {
         this.repository = repository;
     }

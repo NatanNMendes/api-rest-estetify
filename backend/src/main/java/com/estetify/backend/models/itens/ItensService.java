@@ -1,10 +1,8 @@
 package com.estetify.backend.models.itens;
 
 import com.estetify.backend.utils.ItensType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,12 +11,15 @@ import java.util.List;
 public class ItensService extends Itens{
     private LocalDateTime availabilityDate;
     private LocalDateTime reservedDate;
-    @ManyToMany
+
+
+    @ManyToMany(fetch = FetchType.EAGER) // Adicionado FetchType.EAGER
     @JoinTable(
             name = "service_products",
             joinColumns = @JoinColumn(name = "service_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ItensProduct> materialsUsed;
 
     public ItensService() {
