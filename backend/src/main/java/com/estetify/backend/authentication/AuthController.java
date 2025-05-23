@@ -23,10 +23,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        Authentication auth = authManager.authenticate(
+        Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(), // Usar .username() ao invés de .getUsername()
-                        request.password()  // Usar .password() ao invés de .getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
 
@@ -35,6 +35,6 @@ public class AuthController {
     }
 }
 
-// DTOs
+// Records para DTOs
 record AuthRequest(String username, String password) {}
 record AuthResponse(String token) {}
