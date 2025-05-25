@@ -1,4 +1,4 @@
-package com.estetify.backend.repository;
+package com.estetify.backend.repository.itens;
 
 import com.estetify.backend.models.itens.ItensProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
