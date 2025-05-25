@@ -1,7 +1,7 @@
 package com.estetify.backend.controller.itens;
 
 import com.estetify.backend.models.itens.ItensProduct;
-import com.estetify.backend.repository.ItensProductRepository;
+import com.estetify.backend.repository.itens.ItensProductRepository;
 import com.estetify.backend.utils.ItensType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

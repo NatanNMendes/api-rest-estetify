@@ -2,8 +2,8 @@ package com.estetify.backend.controller.itens;
 
 import com.estetify.backend.models.itens.ItensProduct;
 import com.estetify.backend.models.itens.ItensService;
-import com.estetify.backend.repository.ItensProductRepository;
-import com.estetify.backend.repository.ItensServiceRepository;
+import com.estetify.backend.repository.itens.ItensProductRepository;
+import com.estetify.backend.repository.itens.ItensServiceRepository;
 import com.estetify.backend.utils.ItensType;
 import lombok.Getter;
 import lombok.Setter;
