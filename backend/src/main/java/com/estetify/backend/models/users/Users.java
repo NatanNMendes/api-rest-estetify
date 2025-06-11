@@ -13,8 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-
-
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -46,6 +44,9 @@ public abstract class Users {
     @Enumerated(EnumType.STRING)
     private Sexuality sexuality;
 
+    @Size(max = 9)
+    private String vat;
+
     @NotBlank
     @Email
     @Column(unique = true)
@@ -61,12 +62,12 @@ public abstract class Users {
 
     private LocalDateTime createdAt;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String profilePhoto;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
-
-
 }

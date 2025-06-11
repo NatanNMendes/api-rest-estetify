@@ -16,11 +16,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 
@@ -47,11 +51,47 @@ public class UsersCustomerController {
                 .gender(userDTO.getGender())
                 .sexuality(userDTO.getSexuality())
                 .profilePhoto(userDTO.getProfilePhoto())
+                .vat(userDTO.getVat())
                 .build();
 
         UsersCustomer savedUser = usersCustomerRepository.save(newUser);
         return ResponseEntity.created(URI.create("/api/users/customers/" + savedUser.getId()))
                 .body(savedUser);
+    }
+
+    @PostMapping("/{userId}/profile-photo")
+    public ResponseEntity<?> uploadProfilePhoto(
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file) {
+
+        try {
+
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Arquivo não pode estar vazio");
+            }
+
+            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+                return ResponseEntity.badRequest().body("Apenas arquivos de imagem são permitidos");
+            }
+
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body("O tamanho da imagem não pode exceder 5MB");
+            }
+
+            String base64Image = Base64.getEncoder().encodeToString(file.getBytes());
+
+            return usersCustomerRepository.findById(userId)
+                    .map(user -> {
+                        user.setProfilePhoto(base64Image);
+                        usersCustomerRepository.save(user);
+                        return ResponseEntity.ok("Foto de perfil atualizada com sucesso");
+                    })
+                    .orElse(ResponseEntity.notFound().build());
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao processar a imagem: " + e.getMessage());
+        }
     }
 
     @GetMapping
@@ -80,7 +120,10 @@ public class UsersCustomerController {
                     existingUser.setBirthDate(updateDTO.getBirthDate());
                     existingUser.setGender(updateDTO.getGender());
                     existingUser.setSexuality(updateDTO.getSexuality());
-                    existingUser.setProfilePhoto(updateDTO.getProfilePhoto());
+                    existingUser.setVat(updateDTO.getVat());
+                    if (updateDTO.getProfilePhoto() != null) {
+                        existingUser.setProfilePhoto(updateDTO.getProfilePhoto());
+                    }
 
                     UsersCustomer updatedUser = usersCustomerRepository.save(existingUser);
                     return ResponseEntity.ok(updatedUser);
@@ -157,6 +200,8 @@ public class UsersCustomerController {
         private Gender gender;
         private Sexuality sexuality;
         private String profilePhoto;
+
+        private String vat;
     }
 
     @Data
@@ -171,6 +216,7 @@ public class UsersCustomerController {
         private Gender gender;
         private Sexuality sexuality;
         private String profilePhoto;
+        private String vat;
     }
 
     @Data
