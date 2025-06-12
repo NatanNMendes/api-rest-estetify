@@ -2,20 +2,10 @@ package com.estetify.backend.models.users;
 
 import com.estetify.backend.models.itens.Itens;
 import com.estetify.backend.models.itens.ItensProduct;
-import com.estetify.backend.utils.Gender;
-import com.estetify.backend.utils.Sexuality;
-import com.estetify.backend.utils.UsersType;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 
 
