@@ -136,13 +136,11 @@ public class UsersCustomerController {
             @PathVariable Long userId,
             @Valid @RequestBody ItemOperationDTO itemDTO) {
 
-        // Busca o usuário
         Optional<UsersCustomer> userOpt = usersCustomerRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        // Busca o item pelo ID
         Optional<ItensProduct> itemOpt = itensProductRepository.findById(itemDTO.getItemId());
         if (itemOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Item não encontrado");
@@ -150,8 +148,6 @@ public class UsersCustomerController {
 
         UsersCustomer user = userOpt.get();
         ItensProduct item = itemOpt.get();
-
-        // Adiciona o item ao carrinho
         user.getShoppingCart().add(item);
         usersCustomerRepository.save(user);
 
