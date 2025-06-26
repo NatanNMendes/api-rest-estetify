@@ -4,6 +4,7 @@ import com.estetify.backend.models.itens.ItensProduct;
 import com.estetify.backend.models.users.UsersCustomer;
 import com.estetify.backend.repository.itens.ItensProductRepository;
 import com.estetify.backend.repository.users.UsersCustomerRepository;
+import com.estetify.backend.security.JwtTokenProvider;
 import com.estetify.backend.utils.Gender;
 import com.estetify.backend.utils.Sexuality;
 import jakarta.validation.Valid;
@@ -24,9 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users/customers")
@@ -36,6 +35,7 @@ public class UsersCustomerController {
     private final UsersCustomerRepository usersCustomerRepository;
     private final ItensProductRepository itensProductRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UsersCustomerDTO userDTO) {
@@ -55,6 +55,13 @@ public class UsersCustomerController {
                 .build();
 
         UsersCustomer savedUser = usersCustomerRepository.save(newUser);
+
+        String token = jwtTokenProvider.generateToken(savedUser.getEmail());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", savedUser);
+        response.put("token", token);
+
         return ResponseEntity.created(URI.create("/api/users/customers/" + savedUser.getId()))
                 .body(savedUser);
     }

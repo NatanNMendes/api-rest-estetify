@@ -44,7 +44,7 @@ public abstract class Users {
     @Enumerated(EnumType.STRING)
     private Sexuality sexuality;
 
-    @Size(max = 9)
+    @Size(max = 14)
     private String vat;
 
     @NotBlank

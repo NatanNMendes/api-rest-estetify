@@ -1,15 +1,25 @@
 package com.estetify.backend;
 
+import com.estetify.backend.security.JwtTokenProvider;
+import com.estetify.backend.security.SecurityConfig;
+import com.estetify.backend.services.CustomUserDetailsService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 @SpringBootTest
-@ActiveProfiles("test") // Ativa o perfil de teste
-public class BackendApplicationTests {
+class BackendApplicationTests {
+
+	@Autowired
+	private ApplicationContext context;
 
 	@Test
 	void contextLoads() {
-		// Teste vazio para verificar o contexto
+		assertNotNull(context);
 	}
 }
