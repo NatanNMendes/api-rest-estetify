@@ -7,3 +7,4 @@ public class PaymentMethodPix extends PaymentMethod{
     private String bankName;
     private String transactionID;
 }
+    

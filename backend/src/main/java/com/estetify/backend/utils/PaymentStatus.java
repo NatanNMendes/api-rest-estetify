@@ -5,5 +5,7 @@ public enum PaymentStatus {
     PENDING,       // Pendente
     DECLINED,      // Recusado
     CANCELLED,     // Cancelado
-    REFUNDED       // Reembolsado
+    FAILED, REFUNDED       // Reembolsado
+    ,
+    COMPLETED;
 }
