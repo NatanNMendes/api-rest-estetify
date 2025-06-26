@@ -1,5 +1,7 @@
 package com.estetify.backend.authentication;
 
+import com.estetify.backend.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,15 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authManager;
-    private final JwtUtils jwtUtils;
-
-    public AuthController(AuthenticationManager authManager, JwtUtils jwtUtils) {
-        this.authManager = authManager;
-        this.jwtUtils = jwtUtils;
-    }
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
@@ -30,11 +28,10 @@ public class AuthController {
                 )
         );
 
-        String token = jwtUtils.generateToken(request.username());
+        String token = jwtTokenProvider.generateToken(request.username());
         return ResponseEntity.ok(new AuthResponse(token));
     }
-}
 
-// Records para DTOs
-record AuthRequest(String username, String password) {}
-record AuthResponse(String token) {}
+    public record AuthRequest(String username, String password) {}
+    public record AuthResponse(String token) {}
+}
