@@ -5,6 +5,63 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Arquivos de credenciais específicos
+backend/src/main/resources/firebase-service-account.json
+
+# Arquivos gerados pelo Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Arquivos de banco de dados H2 (se aplicável)
+*.mv.db
+*.trace.db
+
+# Arquivos de configuração local
+*.properties
+*.yml
+
+# Arquivos de log
+*.log
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.swp
+
 ### STS ###
 .apt_generated
 .classpath
