@@ -34,6 +34,9 @@ dependencies {
 	implementation 'com.h2database:h2:2.2.224'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+
+	// Firebase Admin SDK para validar tokens de autenticação
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 	testImplementation 'org.springframework.security:spring-security-test'

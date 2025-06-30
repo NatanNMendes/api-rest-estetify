@@ -1,35 +1,26 @@
 package com.estetify.backend.authentication;
 
 import com.estetify.backend.security.JwtTokenProvider;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
-import java.util.List;
+import java.util.Collections;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
-
-    public JwtAuthFilter(
-            JwtTokenProvider jwtTokenProvider,
-            AuthenticationManager authenticationManager
-    ) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authenticationManager = authenticationManager;
-    }
 
     @Override
     protected void doFilterInternal(
@@ -37,25 +28,32 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        // Mantemos a lógica original de validação do token
-        String token = getJwtFromRequest(request);
+
+        // Pula o filtro para os endpoints de autenticação
+        if (request.getServletPath().contains("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        final String token = getJwtFromRequest(request);
+
         if (token != null && jwtTokenProvider.validateToken(token)) {
             String username = jwtTokenProvider.getUsernameFromToken(token);
 
-            // Criamos um token de autenticação
+            // Se o token é válido, nós confiamos nele e setamos a autenticação no contexto.
+            // Não precisamos mais do AuthenticationManager.
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(username, null);
+                    new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
 
-            // Autenticamos usando o AuthenticationManager
-            var authentication = authenticationManager.authenticate(authenticationToken);
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
         filterChain.doFilter(request, response);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+        final String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

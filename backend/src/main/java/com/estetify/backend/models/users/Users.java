@@ -52,9 +52,11 @@ public abstract class Users {
     @Column(unique = true)
     private String email;
 
-    @NotBlank
-    @Size(min = 8)
+    @Column(nullable = true)
     private String password;
+
+    @Column(unique = true)
+    private String firebaseUid;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "users_type", insertable = false, updatable = false)

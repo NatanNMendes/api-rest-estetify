@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +33,6 @@ public class UsersCustomerController {
 
     private final UsersCustomerRepository usersCustomerRepository;
     private final ItensProductRepository itensProductRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
@@ -42,16 +40,15 @@ public class UsersCustomerController {
         if (usersCustomerRepository.existsByEmail(userDTO.getEmail())) {
             return ResponseEntity.badRequest().body("Email já está em uso");
         }
-
         UsersCustomer newUser = UsersCustomer.builder()
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
                 .birthDate(userDTO.getBirthDate())
                 .gender(userDTO.getGender())
                 .sexuality(userDTO.getSexuality())
-                .profilePhoto(userDTO.getProfilePhoto())
-                .vat(userDTO.getVat())
+                .profilePhoto(userDTO.getProfilePhoto() != null ? userDTO.getProfilePhoto() : "")
+                .vat(userDTO.getVat() != null ? userDTO.getVat() : "")
+                .firebaseUid("") // Firebase UID vazio para cadastros manuais
                 .build();
 
         UsersCustomer savedUser = usersCustomerRepository.save(newUser);
@@ -63,7 +60,7 @@ public class UsersCustomerController {
         response.put("token", token);
 
         return ResponseEntity.created(URI.create("/api/users/customers/" + savedUser.getId()))
-                .body(savedUser);
+                .body(response);
     }
 
     @PostMapping("/{userId}/profile-photo")
@@ -96,8 +93,7 @@ public class UsersCustomerController {
                     .orElse(ResponseEntity.notFound().build());
 
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao processar a imagem: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Falha ao processar o arquivo");
         }
     }
 
@@ -193,10 +189,6 @@ public class UsersCustomerController {
         @Email
         @NotBlank
         private String email;
-
-        @NotBlank
-        @Size(min = 8)
-        private String password;
 
         @Past
         private Date birthDate;
