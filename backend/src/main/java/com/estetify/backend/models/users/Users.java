@@ -54,7 +54,7 @@ public abstract class Users {
 
     @NotBlank
     @Size(min = 8)
-    private String password;
+    private char[] password;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "users_type", insertable = false, updatable = false)

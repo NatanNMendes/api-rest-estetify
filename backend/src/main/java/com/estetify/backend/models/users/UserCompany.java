@@ -1,14 +1,16 @@
 package com.estetify.backend.models.users;
 
 import java.security.Permission;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class UserCompany extends Users {
     private Long id;
     private String name;
     private String email;
-    private String password;
+    private char[] password;
     private String cnpj;
     private String endereco;
     private Set<Permission> permissions;
@@ -17,6 +19,21 @@ public class UserCompany extends Users {
     private Date DateRegister;
     private Date LastAccess;
 
+    //Constructors
+
+    public UserCompany (){
+        //Constuctors Default
+    }
+
+    public UserCompany(Long Id, String name, String email, String cnpj) {
+        this.id = id;
+        this.name = name;
+        setEmail(email);
+        setCnpj(cnpj);
+    }
+
+
+
     // Getters e Setters
 
     public Long getId() {
@@ -24,6 +41,9 @@ public class UserCompany extends Users {
     }
 
     public void setId(Long id) {
+        if ( id == null || id <= 0){
+            throw new IllegalArgumentException("Id não pode ser nulo ou vazio");
+        }
         this.id = id;
     }
 
@@ -32,6 +52,9 @@ public class UserCompany extends Users {
     }
 
     public void setName(String name) {
+        if (name == null || name.trim().isEmpty()){
+            throw new IllegalArgumentException("Nome não pode ser nulo ou vazio");
+        }
         this.name = name;
     }
 
@@ -40,14 +63,24 @@ public class UserCompany extends Users {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        if (email == null || !Pattern.matches(emailRegex, email)) {
+            throw new IllegalArgumentException("Email inválido");
+        }
+        this.email = email.toLowerCase().trim();
     }
 
-    public String getPassword() {
-        return password;
+    public char[] getPassword() {
+        return password != null ? password.clone() : null;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(char[] password) {
+        if (password == null || password.length < 8) {
+            throw new IllegalArgumentException("Senha deve ter pelo menos 8 caracteres");
+        }
+        if (this.password != null){
+            Arrays.fill(this.password, '0');
+        }
         this.password = password;
     }
 
@@ -56,6 +89,10 @@ public class UserCompany extends Users {
     }
 
     public void setCnpj(String cnpj) {
+        String cleanedCnpj = cnpj.replaceAll("[^0-9]", "");
+        if(cleanedCnpj.length() != 14) {
+            throw new IllegalArgumentException("O CNPJ deve conter 14 dígitos");
+        }
         this.cnpj = cnpj;
     }
 

@@ -46,7 +46,7 @@ public class UsersCustomerController {
         UsersCustomer newUser = UsersCustomer.builder()
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .password(passwordEncoder.encode(userDTO.getPassword()).toCharArray())
                 .birthDate(userDTO.getBirthDate())
                 .gender(userDTO.getGender())
                 .sexuality(userDTO.getSexuality())
