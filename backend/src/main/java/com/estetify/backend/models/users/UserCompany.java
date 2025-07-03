@@ -3,6 +3,7 @@ package com.estetify.backend.models.users;
 import java.security.Permission;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -101,23 +102,23 @@ public class UserCompany extends Users {
     }
 
     public void setEndereco(String endereco) {
-        this.endereco = endereco;
+        this.endereco = endereco != null ? endereco.trim() : null;
     }
 
     public Set<Permission> getPermissions() {
-        return permissions;
+        return new HashSet<>(permissions);
     }
 
     public void setPermissions(Set<Permission> permissions) {
-        this.permissions = permissions;
+        this.permissions = permissions != null ? new HashSet<>(permissions) : new HashSet<>();
     }
 
     public Set<Contact> getContacts() {
-        return contacts;
+        return new HashSet<>(contacts);
     }
 
     public void setContacts(Set<Contact> contacts) {
-        this.contacts = contacts;
+        this.contacts = contacts != null ? new HashSet<>(contacts) : new HashSet<>();
     }
 
     public Boolean isActive() {
@@ -125,57 +126,91 @@ public class UserCompany extends Users {
     }
 
     public void setActive(Boolean active) {
-        this.active = active;
+        this.active = active != null ? active : true;
     }
 
     public Date getDateRegister() {
-        return DateRegister;
+        return DateRegister != null ? new Date(DateRegister.getTime()) : null;
     }
 
     public void setDateRegister(Date dateRegister) {
-        this.DateRegister = dateRegister;
+        this.DateRegister = dateRegister != null ? new Date(dateRegister.getTime()) : null;
     }
 
     public Date getLastAccess() {
-        return LastAccess;
+        return LastAccess != null ? new Date(LastAccess.getTime()) : null;
     }
 
-    public void setLastAccess(Date lastAccess) {
-        this.LastAccess = lastAccess;
+    public void updateLastAccess() {
+        this.LastAccess = new Date();
+    }
+    // Métodos de negócio
+    public String getFormattedCnpj() {
+        if (cnpj == null || cnpj.length() != 14) return cnpj;
+        return String.format("%s.%s.%s/%s-%s",
+                cnpj.substring(0, 2),
+                cnpj.substring(2, 5),
+                cnpj.substring(5, 8),
+                cnpj.substring(8, 12),
+                cnpj.substring(12));
     }
 
-    // Outros métodos úteis
+    public void addContact(Contact contact) {
+        if (contact != null) {
+            contacts.add(contact);
+        }
+    }
 
+    public void removeContact(Contact contact) {
+        if (contact != null) {
+            contacts.remove(contact);
+        }
+    }
+
+    public void addPermission(Permission permission) {
+        if (permission != null) {
+            permissions.add(permission);
+        }
+    }
+
+    public void removePermission(Permission permission) {
+        if (permission != null) {
+            permissions.remove(permission);
+        }
+    }
+
+    // Métodos de segurança
+    public void clearPassword() {
+        if (password != null) {
+            Arrays.fill(password, '0');
+            password = null;
+        }
+    }
+
+    // Representação do objeto
     @Override
     public String toString() {
         return "UserCompany{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", cnpj='" + cnpj + '\'' +
-                ", endereco='" + endereco + '\'' +
+                ", cnpj='" + getFormattedCnpj() + '\'' +
                 ", active=" + active +
                 '}';
     }
 
-    // Método para adicionar uma permissão
-    public void addPermission(Permission permission) {
-        this.permissions.add(permission);
+    // Igualdade baseada no ID
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserCompany that = (UserCompany) o;
+        return id.equals(that.id);
     }
 
-    // Método para remover uma permissão
-    public void removePermission(Permission permission) {
-        this.permissions.remove(permission);
-    }
-
-    // Método para adicionar um contato
-    public void addContact(Contact contact) {
-        this.contacts.add(contact);
-    }
-
-    // Método para remover um contato
-    public void removeContact(Contact contact) {
-        this.contacts.remove(contact);
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
 }
