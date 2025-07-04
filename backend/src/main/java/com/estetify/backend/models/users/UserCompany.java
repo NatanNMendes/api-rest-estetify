@@ -26,6 +26,7 @@ public class UserCompany extends Users {
         //Constuctors Default
     }
 
+    //Construtor com parametros básicos
     public UserCompany(Long Id, String name, String email, String cnpj) {
         this.id = id;
         this.name = name;
@@ -79,6 +80,7 @@ public class UserCompany extends Users {
         if (password == null || password.length < 8) {
             throw new IllegalArgumentException("Senha deve ter pelo menos 8 caracteres");
         }
+        // Limpa a senha anterior se existir
         if (this.password != null){
             Arrays.fill(this.password, '0');
         }
@@ -124,11 +126,11 @@ public class UserCompany extends Users {
     public Boolean isActive() {
         return active;
     }
-
+    //Define o status da empresa
     public void setActive(Boolean active) {
         this.active = active != null ? active : true;
     }
-
+    //Data de resgistro da empresa
     public Date getDateRegister() {
         return DateRegister != null ? new Date(DateRegister.getTime()) : null;
     }
@@ -140,7 +142,7 @@ public class UserCompany extends Users {
     public Date getLastAccess() {
         return LastAccess != null ? new Date(LastAccess.getTime()) : null;
     }
-
+    //Atualiza a data do último acesso para a data/hora atual.
     public void updateLastAccess() {
         this.LastAccess = new Date();
     }
@@ -207,7 +209,7 @@ public class UserCompany extends Users {
         UserCompany that = (UserCompany) o;
         return id.equals(that.id);
     }
-
+    //Retorna o hashcod baseado no id
     @Override
     public int hashCode() {
         return id.hashCode();
