@@ -1,5 +1,6 @@
 package com.estetify.backend.controller.users;
 
+import com.estetify.backend.authentication.JwtUtils;
 import com.estetify.backend.models.itens.ItensProduct;
 import com.estetify.backend.models.users.UsersCustomer;
 import com.estetify.backend.repository.itens.ItensProductRepository;
@@ -36,6 +37,7 @@ public class UsersCustomerController {
     private final UsersCustomerRepository usersCustomerRepository;
     private final ItensProductRepository itensProductRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UsersCustomerDTO userDTO) {
@@ -55,8 +57,11 @@ public class UsersCustomerController {
                 .build();
 
         UsersCustomer savedUser = usersCustomerRepository.save(newUser);
+        String token = jwtUtils.generateToken(savedUser.getEmail());
+        AuthResponse response = new AuthResponse(token, savedUser);
+
         return ResponseEntity.created(URI.create("/api/users/customers/" + savedUser.getId()))
-                .body(savedUser);
+                .body(response);
     }
 
     @PostMapping("/{userId}/profile-photo")
@@ -221,5 +226,11 @@ public class UsersCustomerController {
     public static class ItemOperationDTO {
         @NotNull
         private Long itemId;
+    }
+    @Data
+    @AllArgsConstructor
+    private static class AuthResponse {
+        private String token;
+        private UsersCustomer user;
     }
 }
