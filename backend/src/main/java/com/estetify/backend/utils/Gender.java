@@ -1,8 +1,11 @@
 package com.estetify.backend.utils;
 
 public enum Gender {
-    CISGENDER,
-    TRANSGENDER,
+    MALE_CISGENDER,
+    MALE_TRANSGENDER,
+    FEMALE_CISGENDER,
+    FEMALE_TRANSGENDER,
+    NON_BINARY,
     DEFAULT,
-    OTHERS;
+    PREFER_NOT_TO_SAY
 }
