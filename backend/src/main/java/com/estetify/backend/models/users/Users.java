@@ -1,7 +1,6 @@
 package com.estetify.backend.models.users;
 
 import com.estetify.backend.utils.Gender;
-import com.estetify.backend.utils.Sexuality;
 import com.estetify.backend.utils.UsersType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
