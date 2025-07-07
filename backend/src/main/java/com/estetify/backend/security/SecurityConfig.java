@@ -37,7 +37,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Adicione esta linha
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/itens").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/itens/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/service").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/service/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/customers").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
