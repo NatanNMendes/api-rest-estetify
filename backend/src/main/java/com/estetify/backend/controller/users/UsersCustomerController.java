@@ -6,7 +6,6 @@ import com.estetify.backend.models.users.UsersCustomer;
 import com.estetify.backend.repository.itens.ItensProductRepository;
 import com.estetify.backend.repository.users.UsersCustomerRepository;
 import com.estetify.backend.utils.Gender;
-import com.estetify.backend.utils.Sexuality;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -51,9 +50,10 @@ public class UsersCustomerController {
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .birthDate(userDTO.getBirthDate())
                 .gender(userDTO.getGender())
-                .sexuality(userDTO.getSexuality())
                 .profilePhoto(userDTO.getProfilePhoto())
                 .vat(userDTO.getVat())
+                .phone(userDTO.getPhone())
+                .whatsapp(userDTO.getWhatsapp())
                 .build();
 
         UsersCustomer savedUser = usersCustomerRepository.save(newUser);
@@ -124,8 +124,9 @@ public class UsersCustomerController {
                     existingUser.setName(updateDTO.getName());
                     existingUser.setBirthDate(updateDTO.getBirthDate());
                     existingUser.setGender(updateDTO.getGender());
-                    existingUser.setSexuality(updateDTO.getSexuality());
                     existingUser.setVat(updateDTO.getVat());
+                    existingUser.setPhone(updateDTO.getPhone());
+                    existingUser.setWhatsapp(updateDTO.getWhatsapp());
                     if (updateDTO.getProfilePhoto() != null) {
                         existingUser.setProfilePhoto(updateDTO.getProfilePhoto());
                     }
@@ -199,10 +200,15 @@ public class UsersCustomerController {
         @Past
         private Date birthDate;
         private Gender gender;
-        private Sexuality sexuality;
         private String profilePhoto;
 
         private String vat;
+
+        @Size(max = 20)
+        private String phone;
+
+        @Size(max = 20)
+        private String whatsapp;
     }
 
     @Data
@@ -215,9 +221,14 @@ public class UsersCustomerController {
         @Past
         private Date birthDate;
         private Gender gender;
-        private Sexuality sexuality;
         private String profilePhoto;
         private String vat;
+
+        @Size(max = 20)
+        private String phone;
+
+        @Size(max = 20)
+        private String whatsapp;
     }
 
     @Data
