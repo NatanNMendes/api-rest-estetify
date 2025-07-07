@@ -41,9 +41,6 @@ public abstract class Users {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Enumerated(EnumType.STRING)
-    private Sexuality sexuality;
-
     @Size(max = 14)
     private String vat;
 
@@ -57,7 +54,6 @@ public abstract class Users {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "users_type", insertable = false, updatable = false)
     private UsersType usersType;
 
     private LocalDateTime createdAt;
@@ -65,6 +61,12 @@ public abstract class Users {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String profilePhoto;
+
+    @Size(max = 20)
+    private String phone;
+
+    @Size(max = 20)
+    private String whatsapp;
 
     @PrePersist
     protected void onCreate() {
