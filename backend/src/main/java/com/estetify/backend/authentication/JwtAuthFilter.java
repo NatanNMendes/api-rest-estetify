@@ -10,15 +10,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
-import java.util.List;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+    private final UserDetailsService userDetailsService;
 
-    public JwtAuthFilter(JwtUtils jwtUtils) {
+    public JwtAuthFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
         this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -26,25 +29,38 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
-    ) throws ServletException, IOException { // Adicione as exceções aqui
+    ) throws ServletException, IOException {
 
         try {
-            String token = request.getHeader("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-                Claims claims = jwtUtils.extractClaims(token);
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
 
+                // Validação completa do token
+                jwtUtils.validateToken(token);
+
+                // Extrai o username do token
+                String username = jwtUtils.extractUsername(token);
+
+                // Carrega os detalhes do usuário do banco de dados
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                // Cria a autenticação com as permissões do usuário
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        claims.getSubject(),
+                        userDetails,
                         null,
-                        List.of(() -> "USER")
+                        userDetails.getAuthorities()
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
+        } catch (SecurityException e) {
+            // Tratamento específico para erros de token
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            return;
         } catch (Exception e) {
             logger.error("Erro no processamento do token JWT", e);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro interno ao processar token");
             return;
         }
 

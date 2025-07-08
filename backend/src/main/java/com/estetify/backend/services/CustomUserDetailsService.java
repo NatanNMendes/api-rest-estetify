@@ -1,30 +1,34 @@
 package com.estetify.backend.services;
 
-import org.springframework.context.annotation.Bean;
+import com.estetify.backend.repository.users.UsersRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.estetify.backend.models.users.Users;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    // Implementação temporária para testes
+    private final UsersRepository usersRepository;
+
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Users user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+
+        String role = "ROLE_" + user.getUsersType().name();
+
         return User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("senha123"))
-                .roles("USER")
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(role)
                 .build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-
 }
