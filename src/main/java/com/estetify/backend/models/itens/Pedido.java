@@ -21,6 +21,7 @@ public class Pedido {
     }
 
     public Pedido() {
+        // Construtor vazio
     }
 
     // Getters e Setters
@@ -71,10 +72,12 @@ public class Pedido {
 
     // Método para calcular o valor total
     private void calcularValorTotal() {
-        this.valorTotal = 0;
+        valorTotal = 0.0;
         if (produtos != null) {
             for (Produto produto : produtos) {
-                this.valorTotal += produto.getPreco();
+                if (produto != null) {
+                    valorTotal += produto.getPreco();
+                }
             }
         }
     }
@@ -83,9 +86,19 @@ public class Pedido {
     public void exibirResumo() {
         System.out.println("Pedido ID: " + id);
         System.out.println("Data: " + data);
+
         System.out.println("Produtos:");
-        for (Produto p : produtos) System.out.println("- " + p.getNome() + " R$" + p.getPreco());
-        System.out.println("Valor Total: R$" + valorTotal);
+        if (produtos != null && !produtos.isEmpty()) {
+            for (Produto p : produtos) {
+                if (p != null) {
+                    System.out.printf("- %s R$%.2f%n", p.getNome(), p.getPreco());
+                }
+            }
+        } else {
+            System.out.println("- Nenhum produto no pedido.");
+        }
+
+        System.out.printf("Valor Total: R$%.2f%n", valorTotal);
         System.out.println("Forma de Pagamento: " + formaPagamento);
         System.out.println("Pago: " + (pago ? "Sim" : "Não"));
     }
