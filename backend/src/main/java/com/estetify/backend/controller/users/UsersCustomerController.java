@@ -6,6 +6,7 @@ import com.estetify.backend.models.users.UsersCustomer;
 import com.estetify.backend.repository.itens.ItensProductRepository;
 import com.estetify.backend.repository.users.UsersCustomerRepository;
 import com.estetify.backend.utils.Gender;
+import com.estetify.backend.utils.UsersType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -48,6 +49,7 @@ public class UsersCustomerController {
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
+                .usersType(UsersType.CUSTOMER)
                 .birthDate(userDTO.getBirthDate())
                 .gender(userDTO.getGender())
                 .profilePhoto(userDTO.getProfilePhoto())
