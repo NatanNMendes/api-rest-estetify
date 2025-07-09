@@ -7,6 +7,7 @@ import com.estetify.backend.repository.itens.ItensProductRepository;
 import com.estetify.backend.repository.users.UsersCustomerRepository;
 import com.estetify.backend.utils.Gender;
 import com.estetify.backend.utils.UsersType;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -76,6 +77,7 @@ public class UsersCustomerController {
     }
 
     @PostMapping("/{userId}/profile-photo")
+    @Transactional
     public ResponseEntity<?> uploadProfilePhoto(
             @PathVariable Long userId,
             @RequestParam("file") MultipartFile file) {

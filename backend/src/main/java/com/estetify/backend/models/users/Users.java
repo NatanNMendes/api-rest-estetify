@@ -63,8 +63,7 @@ public abstract class Users implements UserDetails {
 
     private LocalDateTime createdAt;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "profile_photo", columnDefinition = "TEXT") // 👈 Use TEXT para PostgreSQL
     private String profilePhoto;
 
     @Size(max = 20)

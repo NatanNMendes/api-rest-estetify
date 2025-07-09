@@ -2,6 +2,7 @@ package com.estetify.backend.services;
 
 import com.estetify.backend.repository.users.UsersRepository;
 import com.estetify.backend.utils.UsersType;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsersRepository usersRepository;
