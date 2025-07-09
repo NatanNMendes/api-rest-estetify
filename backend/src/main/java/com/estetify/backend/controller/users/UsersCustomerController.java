@@ -19,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -49,17 +52,23 @@ public class UsersCustomerController {
                 .name(userDTO.getName())
                 .email(userDTO.getEmail())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
-                .usersType(UsersType.CUSTOMER)
                 .birthDate(userDTO.getBirthDate())
                 .gender(userDTO.getGender())
                 .profilePhoto(userDTO.getProfilePhoto())
                 .vat(userDTO.getVat())
                 .phone(userDTO.getPhone())
                 .whatsapp(userDTO.getWhatsapp())
+                .usersType(UsersType.CUSTOMER)
                 .build();
 
         UsersCustomer savedUser = usersCustomerRepository.save(newUser);
-        String token = jwtUtils.generateToken(savedUser.getEmail());
+
+        List<GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + savedUser.getUsersType().name())
+        );
+
+        String token = jwtUtils.generateToken(savedUser.getEmail(), authorities);
+
         AuthResponse response = new AuthResponse(token, savedUser);
 
         return ResponseEntity.created(URI.create("/api/users/customers/" + savedUser.getId()))
