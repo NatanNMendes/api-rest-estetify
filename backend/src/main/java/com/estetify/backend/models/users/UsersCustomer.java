@@ -2,6 +2,7 @@ package com.estetify.backend.models.users;
 
 import com.estetify.backend.models.itens.Itens;
 import com.estetify.backend.models.itens.ItensProduct;
+import com.estetify.backend.models.itens.PurchaseHistory;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -33,8 +34,7 @@ public class UsersCustomer extends Users {
     private List<ItensProduct> purchasedItems = new ArrayList<>();
 
     @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "user_purchase_history", joinColumns = @JoinColumn(name = "user_id"))
-    private List<Itens> purchaseHistory = new ArrayList<>();
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PurchaseHistory> purchaseHistory = new ArrayList<>();
 
 }

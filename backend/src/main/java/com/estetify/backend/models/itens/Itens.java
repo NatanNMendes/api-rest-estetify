@@ -2,6 +2,8 @@ package com.estetify.backend.models.itens;
 
 import com.estetify.backend.utils.ItensType;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -21,6 +23,9 @@ public abstract class Itens {
     private Double discount;
     private LocalDateTime createdAt;
     private String image;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<PurchaseHistory> purchaseHistory = new ArrayList<>();
 
     public Itens(){}
 
