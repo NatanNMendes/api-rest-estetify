@@ -3,15 +3,15 @@ package com.estetify.backend.models.itens;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Pedido {
+public class Order {
     private int id;
     private LocalDate data;
-    private List<Produto> produtos;
+    private List<Product> produtos;
     private double valorTotal;
     private String formaPagamento;
     private boolean pago;
 
-    public Pedido(int id, LocalDate data, List<Produto> produtos, String formaPagamento, boolean pago) {
+    public Order(int id, LocalDate data, List<Product> produtos, String formaPagamento, boolean pago) {
         this.id = id;
         this.data = data;
         this.produtos = produtos;
@@ -20,7 +20,7 @@ public class Pedido {
         calcularValorTotal();
     }
 
-    public Pedido() {
+    public Order() {
         // Construtor vazio
     }
 
@@ -41,11 +41,11 @@ public class Pedido {
         this.data = data;
     }
 
-    public List<Produto> getProdutos() {
+    public List<Product> getProdutos() {
         return produtos;
     }
 
-    public void setProdutos(List<Produto> produtos) {
+    public void setProdutos(List<Product> produtos) {
         this.produtos = produtos;
         calcularValorTotal();
     }
@@ -74,7 +74,7 @@ public class Pedido {
     private void calcularValorTotal() {
         valorTotal = 0.0;
         if (produtos != null) {
-            for (Produto produto : produtos) {
+            for (Product produto : produtos) {
                 if (produto != null) {
                     valorTotal += produto.getPreco();
                 }
@@ -89,7 +89,7 @@ public class Pedido {
 
         System.out.println("Produtos:");
         if (produtos != null && !produtos.isEmpty()) {
-            for (Produto p : produtos) {
+            for (Product p : produtos) {
                 if (p != null) {
                     System.out.printf("- %s R$%.2f%n", p.getNome(), p.getPreco());
                 }

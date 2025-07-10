@@ -1,17 +1,17 @@
 package com.estetify.backend.models.itens;
 
-public class Produto {
+public class Product {
     private int id;
     private String nome;
     private double preco;
 
-    public Produto(int id, String nome, double preco) {
+    public Product(int id, String nome, double preco) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
     }
 
-    public Produto() {
+    public Product() {
         // Construtor vazio
     }
 
