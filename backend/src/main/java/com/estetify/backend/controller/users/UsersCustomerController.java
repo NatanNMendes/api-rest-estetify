@@ -2,8 +2,10 @@ package com.estetify.backend.controller.users;
 
 import com.estetify.backend.authentication.JwtUtils;
 import com.estetify.backend.models.itens.ItensProduct;
+import com.estetify.backend.models.itens.PurchaseHistory;
 import com.estetify.backend.models.users.UsersCustomer;
 import com.estetify.backend.repository.itens.ItensProductRepository;
+import com.estetify.backend.repository.itens.PurchaseHistoryRepository;
 import com.estetify.backend.repository.users.UsersCustomerRepository;
 import com.estetify.backend.utils.Gender;
 import com.estetify.backend.utils.UsersType;
@@ -28,10 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/users/customers")
@@ -40,6 +40,7 @@ public class UsersCustomerController {
 
     private final UsersCustomerRepository usersCustomerRepository;
     private final ItensProductRepository itensProductRepository;
+    private final PurchaseHistoryRepository purchaseHistoryRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
@@ -174,18 +175,32 @@ public class UsersCustomerController {
     }
 
     @PostMapping("/{userId}/purchase")
+    @Transactional
     public ResponseEntity<?> purchaseItems(@PathVariable Long userId) {
-        return usersCustomerRepository.findById(userId)
-                .map(user -> {
-                    user.getPurchasedItems().addAll(user.getShoppingCart());
-                    user.getPurchaseHistory().addAll(user.getShoppingCart());
-                    user.getShoppingCart().clear();
-                    usersCustomerRepository.save(user);
-                    return ResponseEntity.ok().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+        Optional<UsersCustomer> userOpt = usersCustomerRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
+        UsersCustomer user = userOpt.get();
+
+        // Adiciona itens à lista de comprados
+        user.getPurchasedItems().addAll(user.getShoppingCart());
+
+        // Cria histórico de compra para cada item
+        user.getShoppingCart().forEach(item -> {
+            user.getPurchaseHistory().add(new PurchaseHistory(user, item));
+        });
+
+        user.getShoppingCart().clear();
+        usersCustomerRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Compra realizada com sucesso",
+                "purchasedItems", user.getPurchasedItems().size(),
+                "newHistoryEntries", user.getPurchaseHistory().size()
+        ));
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         if (usersCustomerRepository.existsById(id)) {

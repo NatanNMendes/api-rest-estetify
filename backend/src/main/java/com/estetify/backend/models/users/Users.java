@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
@@ -63,7 +65,7 @@ public abstract class Users implements UserDetails {
 
     private LocalDateTime createdAt;
 
-    @Column(name = "profile_photo", columnDefinition = "TEXT") // 👈 Use TEXT para PostgreSQL
+    @Column(name = "profile_photo", columnDefinition = "TEXT")
     private String profilePhoto;
 
     @Size(max = 20)
