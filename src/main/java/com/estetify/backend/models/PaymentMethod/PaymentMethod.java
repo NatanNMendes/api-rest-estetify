@@ -1,31 +1,58 @@
 package com.estetify.backend.models.PaymentMethod;
 
+import com.estetify.backend.utils.PaymentStatus;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
+@Entity
+@Table(name = "payment_methods")
 public class PaymentMethod {
-    private int id;
-    private String type;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private PaymentType type;
+
+    @NotNull
     private BigDecimal amount;
+
+    @NotNull
     private String currency;
+
+    @NotNull
     private LocalDateTime transactionDate;
-    private String status;
 
-    // Getters and Setters
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
-    public int getId() {
+    public PaymentMethod() {
+    }
+
+    public PaymentMethod(PaymentType type, BigDecimal amount, String currency,
+                         LocalDateTime transactionDate, PaymentStatus status) {
+        this.type = type;
+        this.amount = amount;
+        this.currency = currency;
+        this.transactionDate = transactionDate;
+        this.status = status;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getType() {
+    public PaymentType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(PaymentType type) {
         this.type = type;
     }
 
@@ -53,11 +80,38 @@ public class PaymentMethod {
         this.transactionDate = transactionDate;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "PaymentMethod{" +
+                "id=" + id +
+                ", type=" + type +
+                ", amount=" + amount +
+                ", currency='" + currency + '\'' +
+                ", transactionDate=" + transactionDate +
+                ", status=" + status +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PaymentMethod that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    private class PaymentType {
     }
 }

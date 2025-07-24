@@ -1,35 +1,46 @@
 package com.estetify.backend.models.itens;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * Representa um pedido contendo uma lista de produtos, forma de pagamento e status de pagamento.
+ */
 public class Order {
+
     private int id;
     private LocalDate data;
-    private List<Product> produtos;
-    private double valorTotal;
+    private final List<Product> produtos;
+    private BigDecimal valorTotal;
     private String formaPagamento;
     private boolean pago;
 
     public Order(int id, LocalDate data, List<Product> produtos, String formaPagamento, boolean pago) {
         this.id = id;
-        this.data = data;
-        this.produtos = produtos;
-        this.formaPagamento = formaPagamento;
+        this.data = data != null ? data : LocalDate.now();
+        this.produtos = new ArrayList<>();
+        this.formaPagamento = formaPagamento != null ? formaPagamento : "Indefinida";
         this.pago = pago;
-        calcularValorTotal();
+        setProdutos(produtos);
     }
 
     public Order() {
-        // Construtor vazio
+        this.produtos = new ArrayList<>();
+        this.valorTotal = BigDecimal.ZERO;
+        this.data = LocalDate.now();
+        this.formaPagamento = "Indefinida";
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
+        if (id < 0) throw new IllegalArgumentException("ID não pode ser negativo.");
         this.id = id;
     }
 
@@ -38,19 +49,39 @@ public class Order {
     }
 
     public void setData(LocalDate data) {
-        this.data = data;
+        this.data = Objects.requireNonNullElse(data, LocalDate.now());
     }
 
     public List<Product> getProdutos() {
-        return produtos;
+        return Collections.unmodifiableList(produtos);
     }
 
     public void setProdutos(List<Product> produtos) {
-        this.produtos = produtos;
+        this.produtos.clear();
+        if (produtos != null) {
+            for (Product produto : produtos) {
+                if (produto != null) {
+                    this.produtos.add(produto);
+                }
+            }
+        }
         calcularValorTotal();
     }
 
-    public double getValorTotal() {
+    public void adicionarProduto(Product produto) {
+        if (produto != null) {
+            produtos.add(produto);
+            valorTotal = valorTotal.add(BigDecimal.valueOf(produto.getPreco()));
+        }
+    }
+
+    public void removerProduto(Product produto) {
+        if (produto != null && produtos.remove(produto)) {
+            valorTotal = valorTotal.subtract(BigDecimal.valueOf(produto.getPreco()));
+        }
+    }
+
+    public BigDecimal getValorTotal() {
         return valorTotal;
     }
 
@@ -59,7 +90,7 @@ public class Order {
     }
 
     public void setFormaPagamento(String formaPagamento) {
-        this.formaPagamento = formaPagamento;
+        this.formaPagamento = formaPagamento != null ? formaPagamento : "Indefinida";
     }
 
     public boolean isPago() {
@@ -70,36 +101,41 @@ public class Order {
         this.pago = pago;
     }
 
-    // Método para calcular o valor total
     private void calcularValorTotal() {
-        valorTotal = 0.0;
-        if (produtos != null) {
-            for (Product produto : produtos) {
-                if (produto != null) {
-                    valorTotal += produto.getPreco();
-                }
-            }
-        }
+        valorTotal = produtos.stream()
+                .filter(Objects::nonNull)
+                .map(p -> BigDecimal.valueOf(p.getPreco()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // Método para exibir os dados do pedido
-    public void exibirResumo() {
-        System.out.println("Pedido ID: " + id);
-        System.out.println("Data: " + data);
+    /**
+     * Retorna um resumo do pedido como String formatada.
+     */
+    public String getResumoPedido() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pedido ID: ").append(id).append("\n");
+        sb.append("Data: ").append(data).append("\n");
 
-        System.out.println("Produtos:");
-        if (produtos != null && !produtos.isEmpty()) {
-            for (Product p : produtos) {
-                if (p != null) {
-                    System.out.printf("- %s R$%.2f%n", p.getNome(), p.getPreco());
-                }
-            }
+        sb.append("Produtos:\n");
+        if (produtos.isEmpty()) {
+            sb.append("- Nenhum produto no pedido.\n");
         } else {
-            System.out.println("- Nenhum produto no pedido.");
+            for (Product p : produtos) {
+                sb.append(String.format("- %s: R$ %.2f%n", p.getNome(), p.getPreco()));
+            }
         }
 
-        System.out.printf("Valor Total: R$%.2f%n", valorTotal);
-        System.out.println("Forma de Pagamento: " + formaPagamento);
-        System.out.println("Pago: " + (pago ? "Sim" : "Não"));
+        sb.append(String.format("Valor Total: R$ %.2f%n", valorTotal));
+        sb.append("Forma de Pagamento: ").append(formaPagamento).append("\n");
+        sb.append("Pago: ").append(pago ? "Sim" : "Não").append("\n");
+
+        return sb.toString();
+    }
+
+    /**
+     * Exibe o resumo do pedido no console.
+     */
+    public void exibirResumo() {
+        System.out.println(getResumoPedido());
     }
 }
