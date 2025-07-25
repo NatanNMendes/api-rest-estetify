@@ -6,7 +6,7 @@ import java.util.Objects;
  * Representa um produto com ID, nome e preço.
  * Classe preparada para futura integração com JPA e boas práticas.
  */
-public class Product {
+public class Produto {
     private int id;
     private String nome;
     private double preco;
@@ -18,7 +18,7 @@ public class Product {
      * @param nome  Nome do produto (não pode ser nulo ou vazio).
      * @param preco Preço do produto (não pode ser negativo).
      */
-    public Product(int id, String nome, double preco) {
+    public Produto(int id, String nome, double preco) {
         setId(id);
         setNome(nome);
         setPreco(preco);
@@ -27,7 +27,7 @@ public class Product {
     /**
      * Construtor vazio (recomendado para frameworks como JPA ou Jackson).
      */
-    public Product() {}
+    public Produto() {}
 
     // --- Getters e Setters com validações básicas ---
 
@@ -77,8 +77,8 @@ public class Product {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Product)) return false;
-        Product produto = (Product) o;
+        if (!(o instanceof Produto)) return false;
+        Produto produto = (Produto) o;
         return id == produto.id && Double.compare(produto.preco, preco) == 0 && Objects.equals(nome, produto.nome);
     }
 

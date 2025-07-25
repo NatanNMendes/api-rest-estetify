@@ -10,16 +10,16 @@ import java.util.Objects;
 /**
  * Representa um pedido contendo uma lista de produtos, forma de pagamento e status de pagamento.
  */
-public class Order {
+public class Pedido {
 
     private int id;
     private LocalDate data;
-    private final List<Product> produtos;
+    private final List<Produto> produtos;
     private BigDecimal valorTotal;
     private String formaPagamento;
     private boolean pago;
 
-    public Order(int id, LocalDate data, List<Product> produtos, String formaPagamento, boolean pago) {
+    public Pedido(int id, LocalDate data, List<Produto> produtos, String formaPagamento, boolean pago) {
         this.id = id;
         this.data = data != null ? data : LocalDate.now();
         this.produtos = new ArrayList<>();
@@ -28,7 +28,7 @@ public class Order {
         setProdutos(produtos);
     }
 
-    public Order() {
+    public Pedido() {
         this.produtos = new ArrayList<>();
         this.valorTotal = BigDecimal.ZERO;
         this.data = LocalDate.now();
@@ -52,14 +52,14 @@ public class Order {
         this.data = Objects.requireNonNullElse(data, LocalDate.now());
     }
 
-    public List<Product> getProdutos() {
+    public List<Produto> getProdutos() {
         return Collections.unmodifiableList(produtos);
     }
 
-    public void setProdutos(List<Product> produtos) {
+    public void setProdutos(List<Produto> produtos) {
         this.produtos.clear();
         if (produtos != null) {
-            for (Product produto : produtos) {
+            for (Produto produto : produtos) {
                 if (produto != null) {
                     this.produtos.add(produto);
                 }
@@ -68,14 +68,14 @@ public class Order {
         calcularValorTotal();
     }
 
-    public void adicionarProduto(Product produto) {
+    public void adicionarProduto(Produto produto) {
         if (produto != null) {
             produtos.add(produto);
             valorTotal = valorTotal.add(BigDecimal.valueOf(produto.getPreco()));
         }
     }
 
-    public void removerProduto(Product produto) {
+    public void removerProduto(Produto produto) {
         if (produto != null && produtos.remove(produto)) {
             valorTotal = valorTotal.subtract(BigDecimal.valueOf(produto.getPreco()));
         }
@@ -120,7 +120,7 @@ public class Order {
         if (produtos.isEmpty()) {
             sb.append("- Nenhum produto no pedido.\n");
         } else {
-            for (Product p : produtos) {
+            for (Produto p : produtos) {
                 sb.append(String.format("- %s: R$ %.2f%n", p.getNome(), p.getPreco()));
             }
         }
