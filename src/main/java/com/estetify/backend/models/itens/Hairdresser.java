@@ -1,36 +1,59 @@
 package com.estetify.backend.models.itens;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import java.util.Objects;
 
 /**
- * Represents a hairdresser who works in a specific company.
+ * Representa um cabeleireiro vinculado a uma empresa no sistema Estetify.
  */
+@Entity
+@Table(name = "hairdressers")
 public class Hairdresser {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank
+    @Column(nullable = false)
     private String name;
+
+    @Pattern(regexp = "\\+?\\d{8,20}")
     private String phone;
+
+    @Email
     private String email;
+
+    @NotBlank
+    @Column(nullable = false)
     private String specialization;
+
+    @DecimalMin(value = "0.0")
+    @DecimalMax(value = "5.0")
     private Double rating;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    // Constructors
-    public Hairdresser() {
-        // Default constructor
-    }
+    // --- Construtores ---
+
+    public Hairdresser() {}
 
     public Hairdresser(Long id, String name, String phone, String email, String specialization, Double rating, Company company) {
-        this.id = id;
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
-        this.specialization = specialization;
-        this.rating = rating;
-        this.company = company;
+        setId(id);
+        setName(name);
+        setPhone(phone);
+        setEmail(email);
+        setSpecialization(specialization);
+        setRating(rating);
+        setCompany(company);
     }
 
-    // Getters and Setters
+    // --- Getters & Setters com validações internas ---
+
     public Long getId() {
         return id;
     }
@@ -44,7 +67,7 @@ public class Hairdresser {
     }
 
     public void setName(String name) {
-        this.name = name != null ? name.trim() : null;
+        this.name = Objects.requireNonNull(name).trim();
     }
 
     public String getPhone() {
@@ -68,7 +91,7 @@ public class Hairdresser {
     }
 
     public void setSpecialization(String specialization) {
-        this.specialization = specialization != null ? specialization.trim() : null;
+        this.specialization = Objects.requireNonNull(specialization).trim();
     }
 
     public Double getRating() {
@@ -84,15 +107,15 @@ public class Hairdresser {
     }
 
     public void setCompany(Company company) {
-        this.company = company;
+        this.company = Objects.requireNonNull(company, "Company cannot be null");
     }
 
-    // Equals and HashCode based on ID
+    // --- Métodos utilitários ---
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Hairdresser)) return false;
-        Hairdresser that = (Hairdresser) o;
+        if (!(o instanceof Hairdresser that)) return false;
         return Objects.equals(id, that.id);
     }
 
@@ -101,16 +124,12 @@ public class Hairdresser {
         return Objects.hash(id);
     }
 
-    // Optional: toString for debugging/logging
     @Override
     public String toString() {
         return "Hairdresser{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
                 ", specialization='" + specialization + '\'' +
-                ", rating=" + rating +
                 ", company=" + (company != null ? company.getName() : "N/A") +
                 '}';
     }

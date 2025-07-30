@@ -1,22 +1,32 @@
 package com.estetify.backend.models.itens;
 
+import jakarta.persistence.*; // Se estiver usando JPA com Jakarta
 import java.util.Objects;
 
 /**
- * Representa um produto com ID, nome e preço.
- * Classe preparada para futura integração com JPA e boas práticas.
+ * Entidade que representa um produto.
+ * Preparada para integração com frameworks como JPA e Jackson.
  */
+@Entity
+@Table(name = "produtos")
 public class Produto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false, length = 100)
     private String nome;
+
+    @Column(nullable = false)
     private double preco;
 
     /**
-     * Construtor completo do produto.
+     * Construtor completo com validações.
      *
-     * @param id    Identificador único do produto.
-     * @param nome  Nome do produto (não pode ser nulo ou vazio).
-     * @param preco Preço do produto (não pode ser negativo).
+     * @param id    ID do produto (deve ser ≥ 0).
+     * @param nome  Nome do produto (não nulo ou vazio).
+     * @param preco Preço do produto (≥ 0).
      */
     public Produto(int id, String nome, double preco) {
         setId(id);
@@ -25,11 +35,13 @@ public class Produto {
     }
 
     /**
-     * Construtor vazio (recomendado para frameworks como JPA ou Jackson).
+     * Construtor padrão necessário para frameworks como JPA.
      */
-    public Produto() {}
+    public Produto() {
+        // Recomendado manter vazio
+    }
 
-    // --- Getters e Setters com validações básicas ---
+    // --- Getters e Setters com validações robustas ---
 
     public int getId() {
         return id;
@@ -45,10 +57,12 @@ public class Produto {
     }
 
     public void setNome(String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome do produto não pode ser nulo ou vazio.");
+        Objects.requireNonNull(nome, "Nome não pode ser nulo.");
+        nome = nome.trim();
+        if (nome.isEmpty()) {
+            throw new IllegalArgumentException("Nome do produto não pode ser vazio.");
         }
-        this.nome = nome.trim();
+        this.nome = nome;
     }
 
     public double getPreco() {
@@ -60,14 +74,14 @@ public class Produto {
         this.preco = preco;
     }
 
+    // --- Métodos utilitários ---
+
     /**
-     * Exibe as informações do produto no console.
+     * Exibe os dados do produto no console.
      */
     public void exibirInfo() {
-        System.out.printf("Produto: %s | Preço: R$%.2f%n", nome, preco);
+        System.out.printf("🛒 Produto: %s | 💲 Preço: R$ %.2f%n", nome, preco);
     }
-
-    // --- Métodos utilitários ---
 
     @Override
     public String toString() {
@@ -78,12 +92,42 @@ public class Produto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Produto)) return false;
-        Produto produto = (Produto) o;
-        return id == produto.id && Double.compare(produto.preco, preco) == 0 && Objects.equals(nome, produto.nome);
+        Produto that = (Produto) o;
+        return id == that.id &&
+                Double.compare(that.preco, preco) == 0 &&
+                Objects.equals(nome, that.nome);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, nome, preco);
     }
+
+    // --- Padrão opcional de criação com Builder (recomendado para grandes modelos) ---
+    /*
+    public static class Builder {
+        private int id;
+        private String nome;
+        private double preco;
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder nome(String nome) {
+            this.nome = nome;
+            return this;
+        }
+
+        public Builder preco(double preco) {
+            this.preco = preco;
+            return this;
+        }
+
+        public Produto build() {
+            return new Produto(id, nome, preco);
+        }
+    }
+    */
 }

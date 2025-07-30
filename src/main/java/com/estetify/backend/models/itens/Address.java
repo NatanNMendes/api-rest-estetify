@@ -3,9 +3,12 @@ package com.estetify.backend.models.itens;
 import java.util.Objects;
 
 /**
- * Representa um endereço completo com informações de rua, número, cidade, estado, CEP e país.
+ * Representa um endereço com rua, número, cidade, estado, CEP e país.
+ * Classe preparada para integração com frameworks como JPA ou Jackson.
  */
+// @Embeddable — se quiser embutir em outra entidade JPA
 public class Address {
+
     private String street;
     private String number;
     private String city;
@@ -14,79 +17,92 @@ public class Address {
     private String country;
 
     /**
-     * Construtor padrão.
+     * Construtor padrão para frameworks.
      */
     public Address() {
-        // Construtor vazio necessário para frameworks como JPA/JSON
+        // Construtor vazio necessário para JPA e bibliotecas de serialização
     }
 
     /**
-     * Construtor completo.
-     *
-     * @param street     Nome da rua.
-     * @param number     Número do imóvel.
-     * @param city       Cidade.
-     * @param state      Estado.
-     * @param postalCode Código postal (CEP).
-     * @param country    País.
+     * Construtor completo com validações.
      */
     public Address(String street, String number, String city, String state, String postalCode, String country) {
-        this.street = street;
-        this.number = number;
-        this.city = city;
-        this.state = state;
-        this.postalCode = postalCode;
-        this.country = country;
+        setStreet(street);
+        setNumber(number);
+        setCity(city);
+        setState(state);
+        setPostalCode(postalCode);
+        setCountry(country);
     }
 
-    // Getters e Setters
+    // --- Getters e Setters com validação defensiva ---
+
+    /** @return Nome da rua */
     public String getStreet() {
         return street;
     }
 
     public void setStreet(String street) {
-        this.street = street;
+        this.street = validateNotBlank(street, "Rua");
     }
 
+    /** @return Número do imóvel */
     public String getNumber() {
         return number;
     }
 
     public void setNumber(String number) {
-        this.number = number;
+        this.number = validateNotBlank(number, "Número");
     }
 
+    /** @return Cidade */
     public String getCity() {
         return city;
     }
 
     public void setCity(String city) {
-        this.city = city;
+        this.city = validateNotBlank(city, "Cidade");
     }
 
+    /** @return Estado (sigla ou nome) */
     public String getState() {
         return state;
     }
 
     public void setState(String state) {
-        this.state = state;
+        this.state = validateNotBlank(state, "Estado").toUpperCase();
     }
 
+    /** @return Código postal (CEP) */
     public String getPostalCode() {
         return postalCode;
     }
 
     public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
+        this.postalCode = validateNotBlank(postalCode, "CEP");
     }
 
+    /** @return País */
     public String getCountry() {
         return country;
     }
 
     public void setCountry(String country) {
-        this.country = country;
+        this.country = validateNotBlank(country, "País").toUpperCase();
     }
+
+    // --- Validação auxiliar ---
+
+    private String validateNotBlank(String value, String fieldName) {
+        Objects.requireNonNull(value, fieldName + " não pode ser nulo.");
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " não pode ser vazio.");
+        }
+        return trimmed;
+    }
+
+    // --- Métodos utilitários ---
 
     @Override
     public String toString() {
