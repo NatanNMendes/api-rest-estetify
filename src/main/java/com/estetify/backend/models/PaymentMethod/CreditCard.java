@@ -5,6 +5,7 @@ import java.util.Objects;
 
 /**
  * Representa um cartão de crédito utilizado como método de pagamento.
+ * Inclui informações do titular, número, validade, CVV, bandeira e parcelas.
  */
 public class CreditCard {
 
@@ -15,15 +16,18 @@ public class CreditCard {
     private int installments;
     private String cardBrand;
 
-    /**
-     * Construtor padrão (necessário para frameworks como Jackson ou JPA).
-     */
-    public CreditCard() {
-        // Construtor vazio
-    }
+    /** Construtor vazio - necessário para serialização e frameworks como JPA ou Jackson. */
+    public CreditCard() {}
 
     /**
      * Construtor completo com validações.
+     *
+     * @param cardNumber       número do cartão sem espaços
+     * @param cardholderName   nome do titular
+     * @param expirationDate   validade do cartão
+     * @param cvv              código de verificação
+     * @param installments     número de parcelas (1-24)
+     * @param cardBrand        bandeira (Visa, MasterCard etc.)
      */
     public CreditCard(String cardNumber, String cardholderName, YearMonth expirationDate,
                       String cvv, int installments, String cardBrand) {
@@ -35,22 +39,20 @@ public class CreditCard {
         setCardBrand(cardBrand);
     }
 
-    // --- Getters e Setters com validações seguras ---
+    // ------------------- Getters e Setters com validação -------------------
 
-    /** @return Número do cartão (sem formatação) */
     public String getCardNumber() {
         return cardNumber;
     }
 
     public void setCardNumber(String cardNumber) {
         Objects.requireNonNull(cardNumber, "Número do cartão não pode ser nulo.");
-        if (cardNumber.length() < 13 || cardNumber.length() > 19 || !cardNumber.matches("\\d+")) {
-            throw new IllegalArgumentException("Número do cartão inválido.");
+        if (!cardNumber.matches("\\d{13,19}")) {
+            throw new IllegalArgumentException("Número do cartão deve conter entre 13 e 19 dígitos.");
         }
         this.cardNumber = cardNumber;
     }
 
-    /** @return Nome do titular do cartão */
     public String getCardholderName() {
         return cardholderName;
     }
@@ -59,7 +61,6 @@ public class CreditCard {
         this.cardholderName = Objects.requireNonNull(cardholderName, "Nome do titular não pode ser nulo.");
     }
 
-    /** @return Data de expiração do cartão */
     public YearMonth getExpirationDate() {
         return expirationDate;
     }
@@ -67,12 +68,11 @@ public class CreditCard {
     public void setExpirationDate(YearMonth expirationDate) {
         Objects.requireNonNull(expirationDate, "Data de validade não pode ser nula.");
         if (expirationDate.isBefore(YearMonth.now())) {
-            throw new IllegalArgumentException("Cartão expirado.");
+            throw new IllegalArgumentException("O cartão está expirado.");
         }
         this.expirationDate = expirationDate;
     }
 
-    /** @return Código de segurança (CVV) */
     public String getCvv() {
         return cvv;
     }
@@ -80,12 +80,11 @@ public class CreditCard {
     public void setCvv(String cvv) {
         Objects.requireNonNull(cvv, "CVV não pode ser nulo.");
         if (!cvv.matches("\\d{3,4}")) {
-            throw new IllegalArgumentException("CVV inválido.");
+            throw new IllegalArgumentException("CVV inválido. Deve conter 3 ou 4 dígitos.");
         }
         this.cvv = cvv;
     }
 
-    /** @return Número de parcelas (mínimo: 1) */
     public int getInstallments() {
         return installments;
     }
@@ -97,7 +96,6 @@ public class CreditCard {
         this.installments = installments;
     }
 
-    /** @return Bandeira do cartão (ex: Visa, MasterCard) */
     public String getCardBrand() {
         return cardBrand;
     }
@@ -106,16 +104,24 @@ public class CreditCard {
         this.cardBrand = Objects.requireNonNull(cardBrand, "Bandeira do cartão não pode ser nula.");
     }
 
-    // --- Métodos utilitários ---
+    // ------------------- Métodos utilitários -------------------
+
+    /** Verifica se o cartão está vencido. */
+    public boolean isExpired() {
+        return expirationDate.isBefore(YearMonth.now());
+    }
+
+    /** Retorna uma versão mascarada do número do cartão, exibindo apenas os 4 últimos dígitos. */
+    public String getMaskedNumber() {
+        if (cardNumber == null || cardNumber.length() < 4) return "****";
+        return "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
+    }
 
     @Override
     public String toString() {
-        String masked = cardNumber != null && cardNumber.length() >= 4
-                ? "**** **** **** " + cardNumber.substring(cardNumber.length() - 4)
-                : "****";
         return String.format(
                 "CreditCard{número='%s', titular='%s', validade=%s, parcelas=%d, bandeira='%s'}",
-                masked, cardholderName, expirationDate, installments, cardBrand
+                getMaskedNumber(), cardholderName, expirationDate, installments, cardBrand
         );
     }
 
