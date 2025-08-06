@@ -3,8 +3,7 @@ package com.estetify.backend.models.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,6 +17,9 @@ public enum PaymentType {
     BOLETO("BOLETO", "Boleto Bancário", false, "🧾"),
     PAYPAL("PAYPAL", "PayPal", true, "🌐"),
     TRANSFER("TRANSFER", "Transferência Bancária", false, "💸");
+
+    private static final Map<String, PaymentType> CODE_MAP =
+            Arrays.stream(values()).collect(Collectors.toUnmodifiableMap(pt -> pt.code, pt -> pt));
 
     private final String code;
     private final String displayName;
@@ -65,17 +67,21 @@ public enum PaymentType {
      */
     @JsonCreator
     public static PaymentType fromCode(String code) {
-        return Arrays.stream(values())
-                .filter(type -> type.code.equalsIgnoreCase(code))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Código inválido de método de pagamento: " + code));
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Código de pagamento não pode ser nulo ou vazio.");
+        }
+        PaymentType type = CODE_MAP.get(code.toUpperCase());
+        if (type == null) {
+            throw new IllegalArgumentException("Método de pagamento desconhecido: " + code);
+        }
+        return type;
     }
 
     /**
      * Lista todos os métodos com seus dados completos (útil para front-ends).
      */
     public static List<PaymentType> getAllTypes() {
-        return Arrays.asList(values());
+        return List.of(values());
     }
 
     /**
@@ -84,11 +90,23 @@ public enum PaymentType {
     public static List<String> getAllDisplayNames() {
         return Arrays.stream(values())
                 .map(PaymentType::getDisplayName)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    /**
+     * Retorna um DTO com todos os dados relevantes (útil para APIs).
+     */
+    public PaymentTypeDTO toDTO() {
+        return new PaymentTypeDTO(code, displayName, allowsInstallments, icon);
     }
 
     @Override
     public String toString() {
         return icon + " " + displayName;
     }
+
+    /**
+     * DTO auxiliar para exposição segura dos dados.
+     */
+    public record PaymentTypeDTO(String code, String displayName, boolean allowsInstallments, String icon) {}
 }
